@@ -56,6 +56,12 @@ public class RequestProcessor implements Runnable {
         headerFull.append((char)c);
       }
       
+      // Get the rest of the HTTP header
+      while(in.ready()){
+    	  int c = in.read(); 
+    	  headerFull.append((char) c);
+      }
+      
       String get = requestLine.toString();
       
       logger.info(connection.getRemoteSocketAddress() + " " + get);
@@ -63,6 +69,8 @@ public class RequestProcessor implements Runnable {
       String[] tokens = get.split("\\s+");
       String method = tokens[0];
       String version = "";
+      
+      // GET
       if (method.equals("GET")) {
         String fileName = tokens[1];
         if (fileName.endsWith("/")) fileName += indexFileName;
@@ -107,22 +115,13 @@ public class RequestProcessor implements Runnable {
       {
     	  logger.info("POST method");
           
-    	  // Get the rest of the HTTP header
-          while(true){
-        	  int c = in.read(); 
-        	  headerFull.append((char) c);
-        	  if(headerFull.toString().contains("end-variables"))
-        		  break;
-          }
+    	  
           logger.info(headerFull.toString());
           
           // Parse the HTTP header for just the POST variables
-          int startIndex = headerFull.indexOf("start-variables");
-          startIndex += "start-variables".length();
-          int endIndex = headerFull.indexOf("end-variables");
-          
-          String varSetString = headerFull.substring(startIndex, endIndex);
-          String[] variables = varSetString.split("&");
+          String[] lines = headerFull.toString().split("\n");
+          System.out.println("variables: " + lines[lines.length-1]);
+          String[] variables = lines[lines.length-1].split("&");
           
           String username = "";
           String password = "";
