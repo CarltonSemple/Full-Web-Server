@@ -7,7 +7,7 @@ function login()
 	poster.onreadystatechange = function()
 	{
 		if(poster.readyState == 4 && poster.status == 200)
-			document.getElementById("submitButton").value = poster.responseText;
+			document.getElementById("StatusArea").innerHTML = poster.responseText;
 	}
 	poster.open("POST", "", true); // true = asynchronous (AJAX)
 	poster.send(parameters);	

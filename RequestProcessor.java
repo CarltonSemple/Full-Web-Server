@@ -144,7 +144,8 @@ public class RequestProcessor implements Runnable {
 				System.out.println("user: " + user.username);
 				System.out.println("password: " + user.password);
 
-				out.write("You're now logged in, " + user.username);
+				// Send response to the client
+				out.write("You're now logged in as " + user.username);
 				out.flush();
 
 			} else { // method does not equal "GET"
