@@ -1,5 +1,9 @@
+package server;
+import helpers.*;
+
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.logging.*;
 
@@ -9,19 +13,23 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
-public class JHTTP {
+import dataModel.User;
 
-	private static final Logger logger = Logger.getLogger(
-			JHTTP.class.getCanonicalName());
+public class ServerMain {
+
+	public static final Logger logger = Logger.getLogger(
+			ServerMain.class.getCanonicalName());
 	private static final String INDEX_FILE = "index.html";
 
 	private final File rootDirectory;
 	private final int port; // https requires port 443
 	
+	public static final String userFilePath = "users.ser";
+	
 	// SSL
-	ServerSocketFactory serveSockFact;
+	ServerSocketFactory serveSockFact;	
 
-	public JHTTP(File rootDirectory, int port) throws IOException {
+	public ServerMain(File rootDirectory, int port) throws IOException {
 
 		if (!rootDirectory.isDirectory()) {
 			throw new IOException(rootDirectory 
@@ -31,14 +39,19 @@ public class JHTTP {
 		this.port = port;
 		
 		this.serveSockFact = SSLServerSocketFactory.getDefault();
+		
+		// Initialize the user list by attempting to load it if it exists
+		User.userList = FileAccess.loadUsers(userFilePath);
+		FileAccess.saveUsers("users.ser", User.userList);
 	}
 
 	public void start() throws IOException {
+		
 		ExecutorService pool = Executors.newCachedThreadPool();
 		try (ServerSocket server = new ServerSocket(port)) //(SSLServerSocket)serveSockFact.createServerSocket(port)) // 
 		{
 			logger.info("Accepting connections on port " + server.getLocalPort());
-			logger.info("Document Root: " + rootDirectory);
+			//logger.info("Document Root: " + rootDirectory);
 			
 			// Add supported cipher suites
 			//server.setEnabledCipherSuites(server.getSupportedCipherSuites());
@@ -57,7 +70,7 @@ public class JHTTP {
 			}
 		}
 	}
-
+			
 	public static void main(String[] args) {
 
 		// get the Document root
@@ -79,7 +92,7 @@ public class JHTTP {
 		}  
 
 		try {            
-			JHTTP webserver = new JHTTP(docroot, port);
+			ServerMain webserver = new ServerMain(docroot, port);
 			webserver.start();
 		} catch (IOException ex) {
 			logger.log(Level.SEVERE, "Server could not start", ex);

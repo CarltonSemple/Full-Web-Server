@@ -9,6 +9,6 @@ function login()
 		if(poster.readyState == 4 && poster.status == 200)
 			document.getElementById("StatusArea").innerHTML = poster.responseText;
 	}
-	poster.open("POST", "", true); // true = asynchronous (AJAX)
+	poster.open("POST", "login", true); // true = asynchronous (AJAX)
 	poster.send(parameters);	
 }

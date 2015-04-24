@@ -1,8 +1,13 @@
+package server;
+import helpers.FileAccess;
+
 import java.io.*;
 import java.net.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.*;
+
+import dataModel.User;
 
 public class RequestProcessor implements Runnable {
 
@@ -113,7 +118,7 @@ public class RequestProcessor implements Runnable {
 			} else if (method.equals("POST")) {
 				logger.info("POST method");
 
-				// logger.info(headerFull.toString());
+				logger.info(headerFull.toString());
 
 				// Parse the HTTP header for just the POST variables
 				String[] lines = headerFull.toString().split("\n");
@@ -141,11 +146,19 @@ public class RequestProcessor implements Runnable {
 					}
 				}
 				User user = new User(username, password);
-				System.out.println("user: " + user.username);
-				System.out.println("password: " + user.password);
+				System.out.println("user: " + user.name());
+				//System.out.println("password: " + user.password);
+				
+				User.userList.add(user);
+				System.out.println("users before saving");
+				User.printUsers();
+				FileAccess.saveUsers(ServerMain.userFilePath, User.userList);
+				User.userList = FileAccess.loadUsers(ServerMain.userFilePath);
+				System.out.println("users after saving and loading");
+				User.printUsers();
 
 				// Send response to the client
-				out.write("You're now logged in as " + user.username);
+				out.write("You're now logged in as " + user.name());
 				out.flush();
 
 			} else { // method does not equal "GET"
