@@ -33,6 +33,10 @@ public class User implements Serializable{
 		return username;
 	}
 	
+	public String password(){
+		return password;
+	}
+	
 	public boolean changeName(String newname, String pass){
 		if(password.equals(pass)){
 			username = newname;

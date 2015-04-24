@@ -1,4 +1,5 @@
 package server;
+import helpers.Authenticator;
 import helpers.FileAccess;
 
 import java.io.*;
@@ -146,19 +147,23 @@ public class RequestProcessor implements Runnable {
 					}
 				}
 				User user = new User(username, password);
-				System.out.println("user: " + user.name());
-				//System.out.println("password: " + user.password);
+				System.out.println(user.toString());
 				
 				User.userList.add(user);
+				
+				/*
 				System.out.println("users before saving");
 				User.printUsers();
 				FileAccess.saveUsers(ServerMain.userFilePath, User.userList);
 				User.userList = FileAccess.loadUsers(ServerMain.userFilePath);
 				System.out.println("users after saving and loading");
-				User.printUsers();
+				User.printUsers();*/
 
 				// Send response to the client
-				out.write("You're now logged in as " + user.name());
+				if(Authenticator.verifyCredentials(user))
+					out.write("You're now logged in as " + user.name());
+				else
+					out.write("Either the username or password are incorrect. Please try again");
 				out.flush();
 
 			} else { // method does not equal "GET"
