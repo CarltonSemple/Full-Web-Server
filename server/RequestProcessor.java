@@ -147,45 +147,10 @@ public class RequestProcessor implements Runnable {
 					out.flush();
 				}
 			}else if(method.equals("HEAD")){
-				String fileName = tokens[1];
-				if (fileName.endsWith("/"))
-					fileName += indexFileName;
-				String contentType = URLConnection.getFileNameMap()
-						.getContentTypeFor(fileName);
-				if (tokens.length > 2) {
-					version = tokens[2];
-				}
+				logger.info("head request");
+				System.out.println("head request");
 
-				File theFile = new File(rootDirectory, fileName.substring(1,
-						fileName.length()));
-
-				if (theFile.canRead()
-				// Don't let clients outside the document root
-						&& theFile.getCanonicalPath().startsWith(root)) {
-					byte[] theData = Files.readAllBytes(theFile.toPath());
-					if (version.startsWith("HTTP/")) { // send a MIME header
-						sendHeader(out, "HTTP/1.0 200 OK", contentType,
-								theData.length);
-					}
-
-					// send the file; it may be an image or other binary data
-					// so use the underlying output stream
-					// instead of the writer
-					raw.flush();
-				} else { // can't find the file
-					logger.info("file not found");
-					String body = new StringBuilder("<HTML>\r\n")
-							.append("<HEAD><TITLE>File Not Found</TITLE>\r\n")
-							.append("</HEAD>\r\n")
-							.append("<BODY>")
-							.append("<H1>HTTP Error 404: File Not Found</H1>\r\n")
-							.append("</BODY></HTML>\r\n").toString();
-					if (version.startsWith("HTTP/")) { // send a MIME header
-						sendHeader(out, "HTTP/1.0 404 File Not Found",
-								"text/html; charset=utf-8", body.length());
-					}
-					out.flush();
-				}
+				sendHeader(out, "HTTP/1.0 200 OK", "header", 0);
 			}else if (method.equals("POST")) {
 				logger.info("POST method");
 				logger.info(headerFull.toString());
@@ -193,10 +158,13 @@ public class RequestProcessor implements Runnable {
 				// Check for which function to execute
 				if(requestLine.toString().contains("login")){
 					login(headerFull, out);
+				}else if(requestLine.toString().contains("createuser")){
+					createUser(headerFull, out);
 				}
 
 			} else { // method does not equal "GET"
 				logger.info("not a GET method");
+				System.out.println("not a method");
 				String body = new StringBuilder("<HTML>\r\n")
 						.append("<HEAD><TITLE>Not Implemented</TITLE>\r\n")
 						.append("</HEAD>\r\n").append("<BODY>")
@@ -221,9 +189,70 @@ public class RequestProcessor implements Runnable {
 		}
 	}
 	
+	/**
+	 * Create a user without any admin permissions
+	 * @param headerFull
+	 * @param out
+	 * @throws IOException
+	 */
+	private void createUser(StringBuilder headerFull, Writer out) throws IOException{
+		// Parse the HTTP header for just the POST variables
+		String[] lines = headerFull.toString().split("\n");
+		System.out.println("variables: " + lines[lines.length - 1]);
+		String[] variables = lines[lines.length - 1].split("&");
+
+		String username = "";
+		String password = "";
+		
+		// Create a user to check against the database
+		System.out.println("here come the variables");
+		for (int i = 0; i < variables.length; i++) {
+			if (variables[i].contains("username")) {
+				username = variables[i].substring(
+						variables[i].indexOf("username"),
+						variables[i].length());
+				String[] te = username.split("=");
+				username = te[1];
+			} else if (variables[i].contains("password")) {
+				password = variables[i].substring(
+						variables[i].indexOf("password"),
+						variables[i].length());
+				String[] te = password.split("=");
+				password = te[1];
+			}
+		}
+		
+		// Create a new user without admin rights
+		User user = new User(username, password, "none");
+		System.out.println(user.toString());
+		
+		User.printUsers();
+		if(User.AddUser(user) == 1){
+			// Save & Reload user list
+			System.out.println("users before saving");
+			User.printUsers();
+			FileAccess.saveUsers(ServerMain.userFilePath, User.userList);
+			User.userList = FileAccess.loadUsers(ServerMain.userFilePath);
+			System.out.println("users after saving and loading");
+			User.printUsers();
+			
+
+			// Send response to the client
+			if(Authenticator.verifyCredentials(user) == 2)
+				out.write("username=" + user.name() + "&key=" + "admin");
+			else if(Authenticator.verifyCredentials(user) == 1)
+				out.write("username=" + user.name() + "&key=" + "none");
+			else
+				out.write("Either the username or password are incorrect. Please try again");
+		}else{
+			out.write("A user with that name already exists");
+		}		
+		
+		out.flush();
+	}
 	
 	/**
-	 * 
+	 * Check to see if a user can log in
 	 * @param headerFull
 	 * @param out
 	 * @throws IOException
@@ -258,22 +287,16 @@ public class RequestProcessor implements Runnable {
 		System.out.println(user.toString());
 		
 		User.printUsers();
-		//User.userList.add(user);
 		
-		/*
-		System.out.println("users before saving");
-		User.printUsers();
-		FileAccess.saveUsers(ServerMain.userFilePath, User.userList);
-		User.userList = FileAccess.loadUsers(ServerMain.userFilePath);
-		System.out.println("users after saving and loading");
-		User.printUsers();*/
-		
-		if(user.Authority() == "admin")
-			Authenticator.key = 1;
+		User.getAuthority(user);
 
 		// Send response to the client
-		if(Authenticator.verifyCredentials(user))
-			out.write("username=" + user.name() + "&key=" + Authenticator.key);
+		if(Authenticator.verifyCredentials(user) == 2){
+			out.write("username=" + user.name() + "&key=" + "admin");
+		}
+		else if(Authenticator.verifyCredentials(user) == 1){
+			out.write("username=" + user.name() + "&key=" + "none");
+		}
 		else
 			out.write("Either the username or password are incorrect. Please try again");
 		out.flush();
@@ -282,11 +305,16 @@ public class RequestProcessor implements Runnable {
 	private void sendHeader(Writer out, String responseCode,
 			String contentType, int length) throws IOException {
 		out.write(responseCode + "\r\n");
+		//System.out.println(responseCode + "\r\n");
 		Date now = new Date();
 		out.write("Date: " + now + "\r\n");
+		//System.out.println("Date: " + now + "\r\n");
 		out.write("Server: JHTTP 2.0\r\n");
+		//System.out.println("Server: JHTTP 2.0\r\n");
 		out.write("Content-length: " + length + "\r\n");
+		//System.out.println("Content-length: " + length + "\r\n");
 		out.write("Content-type: " + contentType + "\r\n\r\n");
+		//System.out.println("Content-type: " + contentType + "\r\n\r\n");
 		out.flush();
 	}
 }

@@ -36,6 +36,7 @@ public class ServerMain {
 
 		// Initialize the user list by attempting to load it if it exists
 		User.userList = FileAccess.loadUsers(userFilePath);
+		User.printUsers();
 	}
 
 	public void start() throws IOException, InterruptedException{

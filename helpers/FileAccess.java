@@ -46,6 +46,11 @@ public class FileAccess {
 		return returnedList;
 	}
 	
+	/*
+	 * Save the users to the specified file
+	 * @param filePath
+	 * @param userList
+	 */
 	public static void saveUsers(String filePath, List<User> userList){
 		FileOutputStream fout = null;
 		ObjectOutputStream oout = null;

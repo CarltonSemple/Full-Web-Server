@@ -1,5 +1,6 @@
 package dataModel;
 import java.io.Serializable;
+import java.util.logging.Level;
 
 import server.ServerMain;
 
@@ -52,17 +53,48 @@ public class User implements Serializable{
 		return false;
 	}
 	
+	/**
+	 * Add a user if a user with that name doesn't already exist
+	 * @param user
+	 * @return
+	 */
+	public static int AddUser(User user){
+		for(User u : User.userList){
+			if(u.name().equals(user.name())){
+				ServerMain.logger.log(Level.WARNING, "user already exists");
+				System.out.println("user already exists");
+				return 0;
+			}
+		}
+		
+		User.userList.add(user);	// add the new unique user
+		ServerMain.logger.log(Level.FINE, user.toString() + " added to user database");
+		System.out.println(user.toString() + " added to user database");
+		return 1;
+	}
+	
+	public static String getAuthority(User user){
+		for(User u : User.userList){
+			if(u.name().equals(user.name())){
+				user.authority = u.Authority();
+				return user.authority;
+			}
+		}
+		return "";
+	}
+	
 	/*
 	 * Iterate through the public static user list, printing them out
 	 */
 	public static void printUsers(){
 		for(User u : User.userList){
-			ServerMain.logger.info(u.toString());
+			ServerMain.logger.log(Level.FINE, u.toString());
+			System.out.println(u.toString());
 		}
 	}
 	
 	@Override
 	public String toString(){
-		return "Username: " + username + " Password: " + password;
+		return "Username: " + username + " Password: " + password + " Authorization: " + authority;
 	}
 }
