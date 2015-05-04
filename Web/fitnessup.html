@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<!--
+	Strata by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>FitnessUP</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+		<script src="js2/jquery.min.js"></script>
+		<script src="js2/jquery.poptrox.min.js"></script>
+		<script src="js2/skel.min.js"></script>
+		<script src="js2/init.js"></script>
+		<script src="js2/editable_text.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css2/skel.css" />
+			<link rel="stylesheet" href="css2/style.css" />
+			<link rel="stylesheet" href="css2/style-xlarge.css" />
+		</noscript>
+		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+	</head>
+	
+	
+	
+	<body id="top" onload="onLoadFunction()">
+
+		<script>
+			var authority = -1;
+			/*
+			* Authorize.  Show/Hide based on if the user is an admin, a regular user, or not logged in.
+			*/
+			function onLoadFunction()
+			{
+				var stri = window.location.href;
+				if(stri.indexOf("admin") > -1){
+					document.getElementById("two").style.visibility = "visible";
+					authority = 1;
+				}
+				else if(stri.indexOf("none") > -1){
+					document.getElementById("two").style.visibility = "hidden";
+					authority = 0;
+				}
+				else{
+					document.getElementById("two").style.visibility = "hidden";
+					document.getElementById("main").innerHTML = "You need to be a user of this site to view the content";
+				}
+			}
+		</script>
+	
+		<!-- Header -->
+			<header id="header">
+				<a href="#" class="image avatar"><img src="images2/Fitness_pic.jpg" alt="" /></a>
+				<h1><strong>I am FitnessUP</strong>, <br />
+				Don't say I can't....Just need to do.<br /></h1>
+			</header>
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- One -->
+					<section id="one">
+						<header class="major">
+							<h2>FitnessUP<br />
+							The next innovative way to share new heathly foods.</h2>
+						</header>
+						<p>FitnessUP is a innovative and refreshing website that provides users the ability to share there most heathly meals that they came across that helped them stay in shape. This is a place that allows the fitness community to come together and talk about all the awesome things they have discovered while being on the journey of becoming healthier person.  </p>
+					</section>
+
+				<!-- Two -->
+					<section id="two">
+						<h2>Recent Work</h2>
+						<div class="row">
+							<article class="6u 12u$(xsmall) work-item">
+								<a href="images2/fulls/Pizza.jpg" class="image fit thumb"><img src="images2/thumbs/Pizza.jpg" alt="" /></a>
+								<h3>
+									<div id="edit1" contenteditable="true"> 
+									Ingredients: Wheat Dough, Arugula Leaves, Basil, garlic, Lemon juice, Parmesan, Ricotta, Mushrooms, cherry tomates
+									</div>
+								</h3>
+								<p>Loved this meal!!!:) Was great to have after a morning workout.</p>
+							</article>
+							<article class="6u$ 12u$(xsmall) work-item">
+								<a href="images2/fulls/oatmeal.jpg" class="image fit thumb"><img src="images2/thumbs/oatmeal.jpg" alt="" /></a>
+								<h3>
+									<div id="edit2" contenteditable="true"> 
+									Ingredients: Stawberries, blueberries, whole wheat crunch, almond shavings
+									</div>
+								</h3>
+								<p>This just hit the spot.!!! Everyone needs to try this simple but delicious snack!!! #feelgood #healthy.</p>
+							</article>
+							<article class="6u 12u$(xsmall) work-item">
+								<a href="images2/fulls/salad.jpg" class="image fit thumb"><img src="images2/thumbs/salad.jpg" alt="" /></a>
+								<h3>
+									<div id="edit3" contenteditable="true"> 
+									Ingredients: Lean Beef, Whole Wheat pasta, Fish, Lean ground turkey, Tofu, Chicken
+									</div>
+								</h3>
+								<p>Great source of protein! Always need the beef!!! #gains #neverstopeating.</p>
+							</article>
+							<article class="6u$ 12u$(xsmall) work-item">
+								<a href="images2/fulls/prep.jpg" class="image fit thumb"><img src="images2/thumbs/prep.jpg" alt="" /></a>
+								<h3>
+									<div id="edit4" contenteditable="true"> 
+									Ingredients: Chicken, carrots, red peppers, lemon, brocoli
+									</div>
+								</h3>
+								<p>Always need to be prepping!!! #prepfordays</p>
+							</article>
+							<article class="6u 12u$(xsmall) work-item">
+								<a href="images2/fulls/snack.jpg" class="image fit thumb"><img src="images2/thumbs/snack.jpg" alt="" /></a>
+								<h3>
+									<div id="edit5" contenteditable="true"> 
+									Ingredients: Cottage Cheese, Raspberries, bananas, cinnamin, blueberry sauce, oatmeal
+									</div>
+								</h3>
+								<p>What a great way to end my day!!! #greatsnack #fitness</p>
+							</article>
+							<article class="6u$ 12u$(xsmall) work-item">
+								<a href="images2/fulls/combo.jpg" class="image fit thumb"><img src="images2/thumbs/combo.jpg" alt="" /></a>
+								<h3>
+									<div id="edit6" contenteditable="true"> 
+									Just a mixture of amazing food
+									</div>
+								</h3>
+								<p>Put together a pic of amazing food I ran into on my trip to Flordia. #alwayseatinghealthy #neverlookingback</p>
+							</article>
+						</div>
+						<ul class="actions">
+							<li><input type="button" value="Save changed Content" onclick="saveEdits()"><br />
+								<div id="update"> - Edit the text and click to save for next time</div>
+							</li>
+						</ul>
+					</section>
+							
+							<h4>Get In Touch</h4>
+							<p>If you have any suggestions on what heathly food recipes you would like to see, please submit a form below so we can get your feedback!!!</p>
+							<form action="mailto:fitnessup16@email.com" method="post">
+								<div class="row uniform 50%">
+									<div class="6u 12u$(xsmall)">
+										<input type="text" name="demo-name" id="demo-name" value="" placeholder="Name" />
+									</div>
+									<div class="12u$">
+										<div class="select-wrapper">
+											<select name="demo-category" id="demo-category">
+												<option value="">- Category -</option>
+												<option value="1">Diet Recipes</option>
+												<option value="1">Workout Routine</option>
+												<option value="1">Concerns</option>
+												<option value="1">other</option>
+											</select>
+										</div>
+									</div>
+									<div class="12u$">
+										<textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="6"></textarea>
+									</div>
+									<div class="12u$">
+										<ul class="actions">
+											<li><input type="submit" value="Send Message" class="special" /></li>
+											<li><input type="reset" value="Reset" /></li>
+										</ul>
+									</div>
+								</div>
+							</form>
+						</section>
+						
+						<!--
+						<section>
+							<h4>Image</h4>
+							<h5>Fit</h5>
+							<div class="box alt">
+								<div class="row 50% uniform">
+									<div class="12u$"><span class="image fit"><img src="images/fulls/05.jpg" alt="" /></span></div>
+									<div class="4u"><span class="image fit"><img src="images/thumbs/01.jpg" alt="" /></span></div>
+									<div class="4u"><span class="image fit"><img src="images/thumbs/02.jpg" alt="" /></span></div>
+									<div class="4u$"><span class="image fit"><img src="images/thumbs/03.jpg" alt="" /></span></div>
+									<div class="4u"><span class="image fit"><img src="images/thumbs/04.jpg" alt="" /></span></div>
+									<div class="4u"><span class="image fit"><img src="images/thumbs/05.jpg" alt="" /></span></div>
+									<div class="4u$"><span class="image fit"><img src="images/thumbs/06.jpg" alt="" /></span></div>
+									<div class="4u"><span class="image fit"><img src="images/thumbs/03.jpg" alt="" /></span></div>
+									<div class="4u"><span class="image fit"><img src="images/thumbs/02.jpg" alt="" /></span></div>
+									<div class="4u$"><span class="image fit"><img src="images/thumbs/01.jpg" alt="" /></span></div>
+								</div>
+							</div>
+							<h5>Left &amp; Right</h5>
+							<p><span class="image left"><img src="images/avatar.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
+							<p><span class="image right"><img src="images/avatar.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
+						</section>
+
+					</section>
+				
+
+			</div>
+			-->
+		<!-- Footer -->
+			<footer id="footer">
+				<ul class="icons">
+					<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+				</ul>
+				<ul class="copyright">
+					<li>&copy; JJC Corporated </li><li>Design: JJC</li>
+				</ul>
+			</footer>
+
+	</body>
+</html>

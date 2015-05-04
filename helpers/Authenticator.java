@@ -17,4 +17,6 @@ public class Authenticator {
 		}
 		return false;
 	}
+	
+	public static int key = 1;	// just a basis for a more complex way of logging in, to be implemented later
 }

@@ -7,7 +7,16 @@ function login()
 	poster.onreadystatechange = function()
 	{
 		if(poster.readyState == 4 && poster.status == 200)
-			document.getElementById("StatusArea").innerHTML = poster.responseText;
+		{			
+			// If the user is logged in, receive the variables
+			if(poster.responseText.indexOf("=") > -1)
+			{
+				var variables = poster.responseText.substring(0);
+				window.location.href="fitnessup.html" + "?" + variables;	
+			}
+			else
+				document.getElementById("StatusArea").innerHTML = poster.responseText;
+		}
 	}
 	poster.open("POST", "login", true); // true = asynchronous (AJAX)
 	poster.send(parameters);	

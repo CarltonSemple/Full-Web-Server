@@ -18,6 +18,8 @@ public class RequestProcessor implements Runnable {
 	private File rootDirectory;
 	private String indexFileName = "index.html";
 	private Socket connection;
+	
+	public static java.util.logging.FileHandler fh;
 
 	public RequestProcessor(File rootDirectory, String indexFileName,
 			Socket connection) {
@@ -35,6 +37,16 @@ public class RequestProcessor implements Runnable {
 		if (indexFileName != null)
 			this.indexFileName = indexFileName;
 		this.connection = connection;
+		
+		// Send the logging information to a log file
+		try{
+			fh = new java.util.logging.FileHandler("servermain.log");
+			logger.addHandler(fh);
+		}catch(SecurityException ex){
+			logger.log(Level.WARNING, "Could not add logger handler", ex);
+		}catch(IOException ex){
+			logger.log(Level.WARNING, "Could not add logger handler", ex);
+		}
 	}
 
 	@Override
@@ -84,6 +96,24 @@ public class RequestProcessor implements Runnable {
 					version = tokens[2];
 				}
 
+				
+				// Get rid of variables from file name
+				String partwhole = new String(fileName);
+								
+				System.out.println("before file: " + fileName);
+				
+				if(partwhole.contains("?")){
+					if(partwhole.length() > 1){
+						System.out.println("partswhole > 1");
+						fileName = partwhole.toString().substring(0, partwhole.toString().indexOf("?"));
+						//System.out.println("parts size: " + parts.length);
+						//if(parts.length > 1)
+						//	fileName = parts[0];
+						System.out.println("file: " + fileName);
+					}
+				}
+				
+				
 				File theFile = new File(rootDirectory, fileName.substring(1,
 						fileName.length()));
 
@@ -116,55 +146,54 @@ public class RequestProcessor implements Runnable {
 					out.write(body);
 					out.flush();
 				}
-			} else if (method.equals("POST")) {
-				logger.info("POST method");
+			}else if(method.equals("HEAD")){
+				String fileName = tokens[1];
+				if (fileName.endsWith("/"))
+					fileName += indexFileName;
+				String contentType = URLConnection.getFileNameMap()
+						.getContentTypeFor(fileName);
+				if (tokens.length > 2) {
+					version = tokens[2];
+				}
 
+				File theFile = new File(rootDirectory, fileName.substring(1,
+						fileName.length()));
+
+				if (theFile.canRead()
+				// Don't let clients outside the document root
+						&& theFile.getCanonicalPath().startsWith(root)) {
+					byte[] theData = Files.readAllBytes(theFile.toPath());
+					if (version.startsWith("HTTP/")) { // send a MIME header
+						sendHeader(out, "HTTP/1.0 200 OK", contentType,
+								theData.length);
+					}
+
+					// send the file; it may be an image or other binary data
+					// so use the underlying output stream
+					// instead of the writer
+					raw.flush();
+				} else { // can't find the file
+					logger.info("file not found");
+					String body = new StringBuilder("<HTML>\r\n")
+							.append("<HEAD><TITLE>File Not Found</TITLE>\r\n")
+							.append("</HEAD>\r\n")
+							.append("<BODY>")
+							.append("<H1>HTTP Error 404: File Not Found</H1>\r\n")
+							.append("</BODY></HTML>\r\n").toString();
+					if (version.startsWith("HTTP/")) { // send a MIME header
+						sendHeader(out, "HTTP/1.0 404 File Not Found",
+								"text/html; charset=utf-8", body.length());
+					}
+					out.flush();
+				}
+			}else if (method.equals("POST")) {
+				logger.info("POST method");
 				logger.info(headerFull.toString());
 
-				// Parse the HTTP header for just the POST variables
-				String[] lines = headerFull.toString().split("\n");
-				System.out.println("variables: " + lines[lines.length - 1]);
-				String[] variables = lines[lines.length - 1].split("&");
-
-				String username = "";
-				String password = "";
-
-				// Create a user to check against the database
-				System.out.println("here come the variables");
-				for (int i = 0; i < variables.length; i++) {
-					if (variables[i].contains("username")) {
-						username = variables[i].substring(
-								variables[i].indexOf("username"),
-								variables[i].length());
-						String[] te = username.split("=");
-						username = te[1];
-					} else if (variables[i].contains("password")) {
-						password = variables[i].substring(
-								variables[i].indexOf("password"),
-								variables[i].length());
-						String[] te = password.split("=");
-						password = te[1];
-					}
+				// Check for which function to execute
+				if(requestLine.toString().contains("login")){
+					login(headerFull, out);
 				}
-				User user = new User(username, password);
-				System.out.println(user.toString());
-				
-				User.userList.add(user);
-				
-				/*
-				System.out.println("users before saving");
-				User.printUsers();
-				FileAccess.saveUsers(ServerMain.userFilePath, User.userList);
-				User.userList = FileAccess.loadUsers(ServerMain.userFilePath);
-				System.out.println("users after saving and loading");
-				User.printUsers();*/
-
-				// Send response to the client
-				if(Authenticator.verifyCredentials(user))
-					out.write("You're now logged in as " + user.name());
-				else
-					out.write("Either the username or password are incorrect. Please try again");
-				out.flush();
 
 			} else { // method does not equal "GET"
 				logger.info("not a GET method");
@@ -190,6 +219,64 @@ public class RequestProcessor implements Runnable {
 			} catch (IOException ex) {
 			}
 		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param headerFull
+	 * @param out
+	 * @throws IOException
+	 */
+	private void login(StringBuilder headerFull, Writer out) throws IOException{
+		// Parse the HTTP header for just the POST variables
+		String[] lines = headerFull.toString().split("\n");
+		System.out.println("variables: " + lines[lines.length - 1]);
+		String[] variables = lines[lines.length - 1].split("&");
+
+		String username = "";
+		String password = "";
+		
+		// Create a user to check against the database
+		System.out.println("here come the variables");
+		for (int i = 0; i < variables.length; i++) {
+			if (variables[i].contains("username")) {
+				username = variables[i].substring(
+						variables[i].indexOf("username"),
+						variables[i].length());
+				String[] te = username.split("=");
+				username = te[1];
+			} else if (variables[i].contains("password")) {
+				password = variables[i].substring(
+						variables[i].indexOf("password"),
+						variables[i].length());
+				String[] te = password.split("=");
+				password = te[1];
+			}
+		}
+		User user = new User(username, password, "none");
+		System.out.println(user.toString());
+		
+		User.printUsers();
+		//User.userList.add(user);
+		
+		/*
+		System.out.println("users before saving");
+		User.printUsers();
+		FileAccess.saveUsers(ServerMain.userFilePath, User.userList);
+		User.userList = FileAccess.loadUsers(ServerMain.userFilePath);
+		System.out.println("users after saving and loading");
+		User.printUsers();*/
+		
+		if(user.Authority() == "admin")
+			Authenticator.key = 1;
+
+		// Send response to the client
+		if(Authenticator.verifyCredentials(user))
+			out.write("username=" + user.name() + "&key=" + Authenticator.key);
+		else
+			out.write("Either the username or password are incorrect. Please try again");
+		out.flush();
 	}
 
 	private void sendHeader(Writer out, String responseCode,

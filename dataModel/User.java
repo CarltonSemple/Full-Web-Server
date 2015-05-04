@@ -22,11 +22,13 @@ public class User implements Serializable{
 	private int id;
 	private String username;
 	private String password;
+	private String authority;	// none, or admin
 	
-	public User(String u, String p){
+	public User(String u, String p, String auth){
 		id = usernum++;
 		username = u;
 		password = p;
+		authority = auth;
 	}
 	
 	public String name(){
@@ -35,6 +37,10 @@ public class User implements Serializable{
 	
 	public String password(){
 		return password;
+	}
+	
+	public String Authority(){
+		return authority;
 	}
 	
 	public boolean changeName(String newname, String pass){
